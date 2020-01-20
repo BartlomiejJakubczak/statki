@@ -4,23 +4,27 @@ import java.util.List;
 
 public class Boat {
 
-    private List<Board.BoardPosition> mBoatHitPoints;
-    private int hitPoints;
+    private List<BoardPosition> boatHitPoints;
 
-    public Boat(List<Board.BoardPosition> boatHitPoints) {
-        this.mBoatHitPoints = boatHitPoints;
-        this.hitPoints = boatHitPoints.size();
+    public Boat(List<BoardPosition> boatHitPoints) {
+        this.boatHitPoints = boatHitPoints;
+        for (BoardPosition boardPosition : boatHitPoints) {
+            boardPosition.setBoatOccupyingPosition(this);
+        }
     }
 
-    public List<Board.BoardPosition> getBoatHitPoints() {
-        return mBoatHitPoints;
+    public List<BoardPosition> getBoatHitPoints() {
+        return boatHitPoints;
     }
 
-    public int getHitPoints() {
-        return hitPoints;
+    public boolean isBoatSunk() {
+        int hitPoints = boatHitPoints.size();
+        for (BoardPosition hitpoint : boatHitPoints) {
+            if (hitpoint.isHit()) {
+                hitPoints--;
+            }
+        }
+        return hitPoints == 0;
     }
 
-    public void setHitPoints(int hitPoints) {
-        this.hitPoints = hitPoints;
-    }
 }

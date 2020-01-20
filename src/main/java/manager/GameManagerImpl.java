@@ -1,79 +1,104 @@
 package manager;
 
 import domain.Board;
-import domain.utils.BoatGenerator;
+import domain.BoardPosition;
+import domain.Boat;
+import utils.BoatGenerator;
+import view.View;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import static utils.Constants.*;
 
 public class GameManagerImpl implements GameManager {
 
-    public static int NUMBER_OF_ACTIVE_TWO_MAST_BOATS = BoatGenerator.NUMBER_OF_TWO_MAST_BOATS;
-    public static int NUMBER_OF_ACTIVE_THREE_MAST_BOATS = BoatGenerator.NUMBER_OF_THREE_MAST_BOATS;
-    public static int NUMBER_OF_ACTIVE_FOUR_MAST_BOATS = BoatGenerator.NUMBER_OF_FOUR_MAST_BOATS;
-    public static int NUMBER_OF_ACTIVE_FIVE_MAST_BOATS = BoatGenerator.NUMBER_OF_FIVE_MAST_BOATS;
+    private Board board;
 
-    private Board mBoard;
-    private Scanner mScanner;
+    private final View boardView;
 
-    public GameManagerImpl() {
-        this.mScanner = new Scanner(System.in);
+    public GameManagerImpl(View view) {
+        boardView = view;
     }
 
-    private int getBoardSizeFromUser() {
-        System.out.println("Podaj rozmiar planszy, minimum to 10.");
-        int size = mScanner.nextInt();
-        while (!isBoardSizeWithingRange(size)) {
-            System.out.println("Podana wartosc jest mniejsza od 10. Sprobuj jeszcze raz.");
-            size = mScanner.nextInt();
+    public int getBoardSizeFromUser() {
+        int receivedValue = boardView.getBoardSizeFromUser();
+        while (!isBoardSizeWithingRange(receivedValue)) {
+            boardView.displayMessage("Podana wartosc jest mniejsza od 10. Sprobuj jeszcze raz.");
         }
-        return size;
+        return receivedValue;
     }
 
-    private List<Integer> getShotCoordinatesFromUser() {
-        System.out.println("Podaj numer rzedu: ");
-        int xPosition = mScanner.nextInt();
-        System.out.println("Podaj numer kolumny: ");
-        int yPosition = mScanner.nextInt();
-        List<Integer> coordinates = new ArrayList<Integer>();
-        coordinates.add(xPosition);
-        coordinates.add(yPosition);
-        return coordinates;
+    public void setBoard(Board board) {
+        this.board = board;
+        setUpBoardPositions();
     }
 
-    private void initializeBoard(int size) {
-        mBoard = Board.getBoardInstance(size);
+    public void generateBoats(BoatGenerator boatGenerator) {
+        int currentTwoMastBoatsNumber = 0;
+        int currentThreeMastBoatsNumber = 0;
+        int currentFourMastBoatsNumber = 0;
+        int currentFiveMastBoatsNumber = 0;
+        List<Boat> generatedBoats = new ArrayList<Boat>();
+        while (currentTwoMastBoatsNumber != NUMBER_OF_TWO_MAST_BOATS) {
+            generatedBoats.add(boatGenerator.generateBoat(TWO_MAST_BOAT));
+            currentTwoMastBoatsNumber++;
+        }
+        while (currentThreeMastBoatsNumber != NUMBER_OF_THREE_MAST_BOATS) {
+            generatedBoats.add(boatGenerator.generateBoat(THREE_MAST_BOAT));
+            currentThreeMastBoatsNumber++;
+        }
+        while (currentFourMastBoatsNumber != NUMBER_OF_FOUR_MAST_BOATS) {
+            generatedBoats.add(boatGenerator.generateBoat(FOUR_MAST_BOAT));
+            currentFourMastBoatsNumber++;
+        }
+        while (currentFiveMastBoatsNumber != NUMBER_OF_FIVE_MAST_BOATS) {
+            generatedBoats.add(boatGenerator.generateBoat(FIVE_MAST_BOAT));
+            currentFiveMastBoatsNumber++;
+        }
+        board.setBoats(generatedBoats);
     }
 
-    private void showBoard() {
-        mBoard.showBoard();
+    public void hitTheBoard(int xPosition, int yPosition) {
+        BoardPosition[][] boardPositions = board.getBoardPositions();
+        boardPositions[xPosition][yPosition].setHit(true);
     }
 
     public void play() {
-        initializeBoard(getBoardSizeFromUser());
-        showBoard();
-        while (!allShipsSunk()) {
-            List<Integer> coordinates = getShotCoordinatesFromUser();
+        boardView.showBoard(board);
+        while(areBoatsFloating()) {
+            List<Integer> coordinates = boardView.getBoardCoordinatesFromUser();
             int xPosition = coordinates.get(0);
             int yPosition = coordinates.get(1);
             hitTheBoard(xPosition, yPosition);
-            showBoard();
+            boardView.showBoard(board);
         }
-        System.out.println("Game over");
+        boardView.closeScanner();
     }
 
-    private void hitTheBoard(int xPosition, int yPosition) {
-        mBoard.receiveShot(xPosition, yPosition);
+    private void setUpBoardPositions() {
+        int boardSize = board.getBoardSize();
+        BoardPosition[][] boardPositions = new BoardPosition[boardSize][boardSize];
+        for (int i = 0; i < boardSize; i ++) {
+            for (int j = 0; j < boardSize; j++) {
+                boardPositions[i][j] = new BoardPosition(i, j);
+            }
+        }
+        board.setBoardPositions(boardPositions);
     }
 
     private boolean isBoardSizeWithingRange(int size) {
-        return size >= 10;
+        return size >= MINIMAL_BOARD_SIZE;
     }
 
-    private boolean allShipsSunk() {
-        return NUMBER_OF_ACTIVE_TWO_MAST_BOATS == 0 &&
-                NUMBER_OF_ACTIVE_THREE_MAST_BOATS == 0 &&
-                NUMBER_OF_ACTIVE_FOUR_MAST_BOATS == 0 &&
-                NUMBER_OF_ACTIVE_FIVE_MAST_BOATS == 0;
+    private boolean areBoatsFloating() {
+        List<Boat> boats = board.getBoats();
+        int numberOfBoats = boats.size();
+        for (Boat boat : boats) {
+            if (boat.isBoatSunk()) {
+                numberOfBoats--;
+            }
+        }
+        return numberOfBoats != 0;
     }
-
 }
