@@ -65,12 +65,12 @@ public class GameTest {
         testBoard.setBoats(Arrays.asList(boatOne, boatTwo));
         Map<Integer, Integer> mappedBoats = testBoard.getNumberOfRemainingBoats();
         int numberOfTwoMastBoats = mappedBoats.get(TWO_MAST_BOAT);
-        assertEquals(numberOfTwoMastBoats, 2);
+        assertEquals(2, numberOfTwoMastBoats);
         testGameManager.hitTheBoard(1, 1);
         testGameManager.hitTheBoard(1, 2);
         mappedBoats = testBoard.getNumberOfRemainingBoats();
         numberOfTwoMastBoats = mappedBoats.get(TWO_MAST_BOAT);
-        assertEquals(numberOfTwoMastBoats, 1);
+        assertEquals(1, numberOfTwoMastBoats);
     }
 
     @Test
@@ -123,7 +123,7 @@ public class GameTest {
     }
 
     private void checkBoatGeneration(BoatGenerator boatGenerator, int boatSize) {
-        assertEquals(boatGenerator.generateBoat(5).getBoatHitPoints().size(), 5);
+        assertEquals(boatSize, boatGenerator.generateBoat(boatSize).getBoatHitPoints().size());
     }
 
 }

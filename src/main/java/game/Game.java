@@ -1,9 +1,10 @@
+package game;
+
 import domain.Board;
 import manager.GameManager;
 import manager.GameManagerImpl;
 import utils.BoatGenerator;
 import view.BoardView;
-import view.View;
 
 public class Game {
 

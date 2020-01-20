@@ -42,28 +42,18 @@ public class Board {
         int numberOfThreeMastBoats = 0;
         int numberOfFourMastBoats = 0;
         int numberOfFiveMastBoats = 0;
-        for (Boat boat: boats) {
-            switch (boat.getBoatHitPoints().size()) {
-                case TWO_MAST_BOAT:
-                    if (!boat.isBoatSunk()) {
-                        mappedBoats.put(TWO_MAST_BOAT, ++numberOfTwoMastBoats);
-                    }
-                    break;
-                case THREE_MAST_BOAT:
-                    if (!boat.isBoatSunk()) {
-                        mappedBoats.put(THREE_MAST_BOAT, ++numberOfThreeMastBoats);
-                    }
-                    break;
-                case FOUR_MAST_BOAT:
-                    if (!boat.isBoatSunk()) {
-                        mappedBoats.put(FOUR_MAST_BOAT, ++numberOfFourMastBoats);
-                    }
-                    break;
-                case FIVE_MAST_BOAT:
-                    if (!boat.isBoatSunk()) {
-                        mappedBoats.put(FIVE_MAST_BOAT, ++numberOfFiveMastBoats);
-                    }
-                    break;
+        for (Boat boat : boats) {
+            if (!boat.isBoatSunk()) {
+                int boatSize = boat.getBoatHitPoints().size();
+                if (boatSize == TWO_MAST_BOAT) {
+                    mappedBoats.put(TWO_MAST_BOAT, ++numberOfTwoMastBoats);
+                } else if (boatSize == THREE_MAST_BOAT) {
+                    mappedBoats.put(THREE_MAST_BOAT, ++numberOfThreeMastBoats);
+                } else if (boatSize == FOUR_MAST_BOAT) {
+                    mappedBoats.put(FOUR_MAST_BOAT, ++numberOfFourMastBoats);
+                } else if (boatSize == FIVE_MAST_BOAT) {
+                    mappedBoats.put(FIVE_MAST_BOAT, ++numberOfFiveMastBoats);
+                }
             }
         }
         return mappedBoats;
